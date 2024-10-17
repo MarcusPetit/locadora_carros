@@ -35,7 +35,8 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Marca::create($request->all());
+        return "esta em store";
     }
 
     /**
@@ -44,10 +45,7 @@ class MarcaController extends Controller
      * @param  \App\Models\Marca  $marca
      * @return \Illuminate\Http\Response
      */
-    public function show(Marca $marca)
-    {
-        //
-    }
+    public function show(Marca $marca) {}
 
     /**
      * Show the form for editing the specified resource.
