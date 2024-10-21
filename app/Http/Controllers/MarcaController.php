@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class MarcaController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +15,8 @@ class MarcaController extends Controller
     public function index()
     {
         $marca = Marca::all();
-        return $marca;
+
+        return response()->json($marca, 200);
     }
 
     /**
@@ -32,13 +32,17 @@ class MarcaController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        Marca::create($request->all());
-        return "esta em store";
+        $marca = new Marca;
+
+        $request->validate($marca->regras(), $marca->feedback());
+
+        $marca = Marca::create($request->all());
+
+        return response()->json($marca, 201);
     }
 
     /**
@@ -47,15 +51,19 @@ class MarcaController extends Controller
      * @param  \App\Models\Marca  $marca
      * @return \Illuminate\Http\Response
      */
-    public function show(Marca $marca)
+    public function show($id)
     {
-        return $marca;
+        $marca = Marca::find($id);
+        if (! $marca) {
+            return response()->json(['nao existe marca com esse id'], 404);
+        }
+
+        return response()->json($marca, 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Marca  $marca
      * @return \Illuminate\Http\Response
      */
     public function edit(Marca $marca) {}
@@ -63,14 +71,18 @@ class MarcaController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Marca  $marca
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Marca $marca)
+    public function update(Request $request, $id)
     {
+        $marca = Marca::find($id);
+        if (! $marca) {
+            return response()->json(['erro' => 'marca nao existe'], 404);
+        }
         $marca->update($request->all());
-        return $marca;
+
+        return response()->json($marca, 201);
     }
 
     /**
@@ -79,9 +91,14 @@ class MarcaController extends Controller
      * @param  \App\Models\Marca  $marca
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Marca $marca)
+    public function destroy($id)
     {
+        $marca = Marca::find($id);
+        if (! $marca) {
+            return response()->json(['erro' => 'marca nao existe'], 404);
+        }
         $marca->delete();
-        return ['msg' => 'marca removida'];
+
+        return response()->json(['suscess' => 'campo deletado com sucesso'], 201);
     }
 }
