@@ -14,7 +14,7 @@ class Marca extends Model
     public function regras()
     {
         return [
-            'nome' => 'required|string|unique:marcas,nome',
+            'nome' => 'required|string|unique:marcas,nome,'.$this->id,
             'imagem' => 'required|string',
         ];
 
