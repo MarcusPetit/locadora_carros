@@ -15,7 +15,7 @@ class Marca extends Model
     {
         return [
             'nome' => 'required|string|unique:marcas,nome,'.$this->id,
-            'imagem' => 'required|string',
+            'imagem' => 'required|file|mines:png,jpg',
         ];
 
     }
@@ -24,6 +24,7 @@ class Marca extends Model
     {
         return [
             'required' => 'O campo esta sem atributos',
+            'imagem.mines' => 'imagem precisa ser png ou jpg',
             'nome.unique' => 'O nome da marca ja existe',
         ];
 
