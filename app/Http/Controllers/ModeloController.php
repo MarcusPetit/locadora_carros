@@ -38,7 +38,7 @@ class ModeloController extends Controller
         //
     }
 
-    /**
+
      * Display the specified resource.
      *
      * @param  \App\Models\Modelo  $modelo

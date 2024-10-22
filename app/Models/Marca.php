@@ -14,10 +14,9 @@ class Marca extends Model
     public function regras()
     {
         return [
-            'nome' => 'required|string|unique:marcas,nome,'.$this->id,
-            'imagem' => 'required|file|mines:png,jpg',
+            'nome' => 'required|string|unique:marcas,nome,' . $this->id,
+            'imagem' => 'required|file|mimes:png,jpg',
         ];
-
     }
 
     public function feedback()
@@ -27,6 +26,5 @@ class Marca extends Model
             'imagem.mines' => 'imagem precisa ser png ou jpg',
             'nome.unique' => 'O nome da marca ja existe',
         ];
-
     }
 }
