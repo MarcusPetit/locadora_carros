@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MarcaController extends Controller
 {
@@ -88,6 +89,7 @@ class MarcaController extends Controller
                     $regrasDInamicas[$input] = $regra;
                 }
             }
+            dd($marca);
 
             dd($regrasDInamicas);
 
@@ -113,6 +115,10 @@ class MarcaController extends Controller
         if (! $marca) {
             return response()->json(['erro' => 'marca nao existe'], 404);
         }
+        if ($request->file('imagem')) {
+        }
+
+        Storage::disk('public')->delete($marca->imagem);
         $marca->delete();
 
         return response()->json(['suscess' => 'campo deletado com sucesso'], 201);
