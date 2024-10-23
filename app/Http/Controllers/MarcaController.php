@@ -15,7 +15,7 @@ class MarcaController extends Controller
      */
     public function index()
     {
-        $marca = Marca::all();
+        $marca = Marca::with('modelos')->get();
 
         return response()->json($marca, 200);
     }
@@ -57,7 +57,7 @@ class MarcaController extends Controller
      */
     public function show($id)
     {
-        $marca = Marca::find($id);
+        $marca = Marca::with('modelos')->find($id);
         if (! $marca) {
             return response()->json(['nao existe marca com esse id'], 404);
         }
@@ -80,25 +80,36 @@ class MarcaController extends Controller
     public function update(Request $request, Marca $marca)
     {
 
-        if ($request->method() === 'PATCH') {
-            $regrasDInamicas = [];
+        if ($request->isMethod('patch')) {
+            $regrasDinamicas = [];
 
+            // Gerar regras dinâmicas apenas para os campos enviados
             foreach ($marca->regras() as $input => $regra) {
-
-                if (array_key_exists($input, $request->all())) {
-                    $regrasDInamicas[$input] = $regra;
+                if ($request->has($input)) {
+                    $regrasDinamicas[$input] = $regra;
                 }
             }
-            dd($marca);
 
-            dd($regrasDInamicas);
-
-            $request->validate($marca->regras(), $marca->feedback());
+            $request->validate($regrasDinamicas, $marca->feedback());
         } else {
-
             $request->validate($marca->regras(), $marca->feedback());
         }
-        $marca->update($request->all());
+
+        // Tratamento do upload da imagem
+        if ($request->hasFile('imagem')) {
+            // Apagar a imagem anterior se existir
+            if ($marca->imagem && \Store::disk('public')->exists($marca->imagem)) {
+                \Storage::disk('public')->delete($marca->imagem);
+            }
+
+            // Armazenar a nova imagem
+            $imagem = $request->file('imagem');
+            $caminho = $imagem->store('imagens', 'public');
+            $marca->imagem = $caminho;
+        }
+
+        $marca->fill($request->except('imagem'));
+        $marca->save();
 
         return response()->json($marca, 200);
     }
@@ -114,8 +125,6 @@ class MarcaController extends Controller
         $marca = Marca::find($id);
         if (! $marca) {
             return response()->json(['erro' => 'marca nao existe'], 404);
-        }
-        if ($request->file('imagem')) {
         }
 
         Storage::disk('public')->delete($marca->imagem);
