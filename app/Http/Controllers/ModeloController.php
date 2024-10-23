@@ -13,11 +13,19 @@ class ModeloController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $modelo = Modelo::with('marca')->get();
+        $modelos = [];
 
-        return response()->json($modelo, 200);
+        if ($request->has('atr')) {
+            $atr = $request->atr;
+            $modelos = Modelo::selectRaw($atr)->with('marca')->get();
+        } else {
+            $modelos = Modelo::with('marca')->get();
+        }
+
+
+        return response()->json($modelos, 200);
     }
 
     /**
