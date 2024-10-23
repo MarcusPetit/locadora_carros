@@ -24,6 +24,21 @@ class ModeloController extends Controller
             $modelos = Modelo::with('marca')->get();
         }
 
+        if ($request->has('atr_marca')) {
+            $atr_marca = $request->atr_marca;
+            $modelos = Modelo::with('marca:id, '.$atr_marca);
+        }else {
+            $modelos = Modelo::with('marca');
+        }
+
+        if ($request->has('filtros')) {
+            $filtros = explode(';', $request->filtros);
+            foreach ($filtros as $key => $condicao) {
+                $valorCondicao = explode(':', $condicao);
+                $modelos = Modelo::where($valorCondicao[0],$valorCondicao[1],$valorCondicao[3]);
+            }
+        }
+
 
         return response()->json($modelos, 200);
     }

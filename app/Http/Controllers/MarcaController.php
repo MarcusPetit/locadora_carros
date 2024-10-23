@@ -13,11 +13,34 @@ class MarcaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $marca = Marca::with('modelos')->get();
+        $marcas = [];
 
-        return response()->json($marca, 200);
+        if ($request->has('atr')) {
+            $atr = $request->atr;
+            $marcas = Marca::selectRaw($atr)->with('modelos')->get();
+        } else {
+            $marcas = Marca::with('modelos')->get();
+        }
+
+        if ($request->has('atr_modelo')) {
+            $atr_modelos = $request->atr_modelo;
+            $marcas = Marca::with('modelos:id, ' . $atr_modelos);
+        } else {
+            $marcas = Marca::with('modelos');
+        }
+
+        if ($request->has('filtros')) {
+            $filtros = explode(';', $request->filtros);
+            foreach ($filtros as $key => $condicao) {
+                $valorCondicao = explode(':', $condicao);
+                $marcas = Marca::where($valorCondicao[0], $valorCondicao[1], $valorCondicao[3]);
+            }
+        }
+
+
+        return response()->json($marcas, 200);
     }
 
     /**
@@ -98,7 +121,7 @@ class MarcaController extends Controller
         // Tratamento do upload da imagem
         if ($request->hasFile('imagem')) {
             // Apagar a imagem anterior se existir
-            if ($marca->imagem && \Store::disk('public')->exists($marca->imagem)) {
+            if ($marca->imagem && \Storege::disk('public')->exists($marca->imagem)) {
                 \Storage::disk('public')->delete($marca->imagem);
             }
 
