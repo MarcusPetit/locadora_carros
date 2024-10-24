@@ -19,25 +19,23 @@ class MarcaController extends Controller
 
         $marca = new Marca();
         $marcaRepository = new MarcaRepository($marca);
-        $marcas = [];
 
-         if($request->has('atributos_modelos')) {
-            $atributos_modelos = 'modelos:id,'.$request->atributos_modelos;
+        if ($request->has('atributos_modelos')) {
+            $atributos_modelos = 'modelos:id,' . $request->atributos_modelos;
             $marcaRepository->selectAtributosRegistrosRelacionados($atributos_modelos);
         } else {
             $marcaRepository->selectAtributosRegistrosRelacionados('modelos');
         }
 
-        if($request->has('filtro')) {
+        if ($request->has('filtro')) {
             $marcaRepository->filtro($request->filtro);
         }
 
-        if($request->has('atributos')) {
+        if ($request->has('atributos')) {
             $marcaRepository->selectAtributos($request->atributos);
         }
 
         return response()->json($marcaRepository->getResultado(), 200);
-        }
     }
 
     /**
