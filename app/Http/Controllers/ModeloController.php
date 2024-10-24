@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Modelo;
+use App\Repositories\ModeloRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage as FacadesStorage;
 
@@ -15,32 +16,25 @@ class ModeloController extends Controller
      */
     public function index(Request $request)
     {
-        $modelos = [];
+        $modelo = new Modelo();
+        $modeloRepository = new ModeloRepository($modelo);
 
-        if ($request->has('atr')) {
-            $atr = $request->atr;
-            $modelos = Modelo::selectRaw($atr)->with('marca')->get();
+        if ($request->has('atributos_marca')) {
+            $atributos_marca = 'marca:id,' . $request->atributos_marca;
+            $modeloRepository->selectAtributosRegistrosRelacionados($atributos_marca);
         } else {
-            $modelos = Modelo::with('marca')->get();
+            $modeloRepository->selectAtributosRegistrosRelacionados('marca');
         }
 
-        if ($request->has('atr_marca')) {
-            $atr_marca = $request->atr_marca;
-            $modelos = Modelo::with('marca:id, '.$atr_marca);
-        }else {
-            $modelos = Modelo::with('marca');
+        if ($request->has('filtro')) {
+            $modeloRepository->filtro($request->filtro);
         }
 
-        if ($request->has('filtros')) {
-            $filtros = explode(';', $request->filtros);
-            foreach ($filtros as $key => $condicao) {
-                $valorCondicao = explode(':', $condicao);
-                $modelos = Modelo::where($valorCondicao[0],$valorCondicao[1],$valorCondicao[3]);
-            }
+        if ($request->has('atributos')) {
+            $modeloRepository->selectAtributos($request->atributos);
         }
 
-
-        return response()->json($modelos, 200);
+        return response()->json($modeloRepository->getResultado(), 200);
     }
 
     /**
@@ -112,6 +106,9 @@ class ModeloController extends Controller
      */
     public function update(Request $request, Modelo $modelo)
     {
+        if ($modelo === null) {
+            return response()->json(['erro' => 'Impossível realizar a atualização']);
+        }
         if ($request->isMethod('patch')) {
             $regrasDinamicas = [];
 

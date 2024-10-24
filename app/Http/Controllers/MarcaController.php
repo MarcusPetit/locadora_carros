@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marca;
+use App\Repositories\MarcaRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,32 +16,28 @@ class MarcaController extends Controller
      */
     public function index(Request $request)
     {
+
+        $marca = new Marca();
+        $marcaRepository = new MarcaRepository($marca);
         $marcas = [];
 
-        if ($request->has('atr')) {
-            $atr = $request->atr;
-            $marcas = Marca::selectRaw($atr)->with('modelos')->get();
+         if($request->has('atributos_modelos')) {
+            $atributos_modelos = 'modelos:id,'.$request->atributos_modelos;
+            $marcaRepository->selectAtributosRegistrosRelacionados($atributos_modelos);
         } else {
-            $marcas = Marca::with('modelos')->get();
+            $marcaRepository->selectAtributosRegistrosRelacionados('modelos');
         }
 
-        if ($request->has('atr_modelo')) {
-            $atr_modelos = $request->atr_modelo;
-            $marcas = Marca::with('modelos:id, ' . $atr_modelos);
-        } else {
-            $marcas = Marca::with('modelos');
+        if($request->has('filtro')) {
+            $marcaRepository->filtro($request->filtro);
         }
 
-        if ($request->has('filtros')) {
-            $filtros = explode(';', $request->filtros);
-            foreach ($filtros as $key => $condicao) {
-                $valorCondicao = explode(':', $condicao);
-                $marcas = Marca::where($valorCondicao[0], $valorCondicao[1], $valorCondicao[3]);
-            }
+        if($request->has('atributos')) {
+            $marcaRepository->selectAtributos($request->atributos);
         }
 
-
-        return response()->json($marcas, 200);
+        return response()->json($marcaRepository->getResultado(), 200);
+        }
     }
 
     /**
