@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreClienteRequest;
 use App\Http\Requests\UpdateClienteRequest;
 use App\Models\Cliente;
+use App\Repositories\ClienteRepository;
+use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
@@ -13,9 +14,22 @@ class ClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $cliente = new Cliente();
+        $clienteRepository = new ClienteRepository($cliente);
+
+
+
+        if ($request->has('filtro')) {
+            $clienteRepository->filtro($request->filtro);
+        }
+
+        if ($request->has('atributos')) {
+            $clienteRepository->selectAtributos($request->atributos);
+        }
+
+        return response()->json($clienteRepository->getResultado(), 200);
     }
 
     /**
@@ -34,9 +48,15 @@ class ClienteController extends Controller
      * @param  \App\Http\Requests\StoreClienteRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreClienteRequest $request)
+    public function store(Request $request)
     {
-        //
+        $cliente = new Cliente();
+
+        $request->validate($cliente->regras());
+        $cliente->nome = $request->nome;
+        $cliente->save();
+
+        return response()->json($cliente, 201);
     }
 
     /**
@@ -45,8 +65,14 @@ class ClienteController extends Controller
      * @param  \App\Models\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function show(Cliente $cliente)
+    public function show($id)
     {
+        $cliente = Cliente::with('modelo')->find($id);
+        if (! $cliente) {
+            return response()->json(['nao existe cliente com esse id'], 404);
+        }
+
+        return response()->json($cliente, 200);
         //
     }
 
@@ -68,9 +94,28 @@ class ClienteController extends Controller
      * @param  \App\Models\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateClienteRequest $request, Cliente $cliente)
+    public function update(Request $request, Cliente $cliente)
     {
-        //
+        if ($request->isMethod('patch')) {
+            $regrasDinamicas = [];
+
+            // Gerar regras dinâmicas apenas para os campos enviados
+            foreach ($cliente->regras() as $input => $regra) {
+                if ($request->has($input)) {
+                    $regrasDinamicas[$input] = $regra;
+                }
+            }
+
+            $request->validate($regrasDinamicas);
+        } else {
+            $request->validate($cliente->regras());
+        }
+
+
+        $cliente->fill($request->all());
+        $cliente->save();
+
+        return response()->json($cliente, 200);
     }
 
     /**
@@ -79,8 +124,15 @@ class ClienteController extends Controller
      * @param  \App\Models\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cliente $cliente)
+    public function destroy($id)
     {
+        $cliente = Cliente::find($id);
+        if (! $cliente) {
+            return response()->json(['erro' => 'cliente nao existe'], 404);
+        }
+        $cliente->delete();
+
+        return response()->json(['suscess' => 'cliente deletado com sucesso'], 201);
         //
     }
 }
