@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLocacaoRequest;
-use App\Http\Requests\UpdateLocacaoRequest;
+use App\Repositories\LocacaoRepository;
 use App\Models\Locacao;
+use Illuminate\Http\Request;
 
 class LocacaoController extends Controller
 {
@@ -13,9 +14,20 @@ class LocacaoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $locacao = new Locacao();
+        $locacaoRepository = new LocacaoRepository($locacao);
+
+        if ($request->has('filtro')) {
+            $locacaoRepository->filtro($request->filtro);
+        }
+
+        if ($request->has('atributos')) {
+            $locacaoRepository->selectAtributos($request->atributos);
+        }
+
+        return response()->json($locacaoRepository->getResultado(), 200);
     }
 
     /**
@@ -36,7 +48,19 @@ class LocacaoController extends Controller
      */
     public function store(StoreLocacaoRequest $request)
     {
-        //
+        $locacao = new Locacao();
+        $request->validate($locacao->regras());
+        $locacao->client_id = $request->cliente_id;
+        $locacao->carro_id = $request->carro_id;
+        $locacao->data_inicio_periodo = $request->data_inicio_periodo;
+        $locacao->data_final_previsto_periodo = $request->data_final_previsto_periodo;
+        $locacao->data_final_realizado_periodo = $request->data_final_realizado_periodoo;
+        $locacao->valor_diaria = $request->valor_diaria;
+        $locacao->km_inicial = $request->km_inicial;
+        $locacao->km_final = $request->km_final;
+        $locacao->save();
+
+        return response()->json($locacao, 201);
     }
 
     /**
@@ -45,9 +69,14 @@ class LocacaoController extends Controller
      * @param  \App\Models\Locacao  $locacao
      * @return \Illuminate\Http\Response
      */
-    public function show(Locacao $locacao)
+    public function show($id)
     {
-        //
+        $locacao = Locacao::with('modelo')->find($id);
+        if (! $locacao) {
+            return response()->json(['nao existe locacao com esse id'], 404);
+        }
+
+        return response()->json($locacao, 200);
     }
 
     /**
@@ -68,9 +97,28 @@ class LocacaoController extends Controller
      * @param  \App\Models\Locacao  $locacao
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateLocacaoRequest $request, Locacao $locacao)
+    public function update(Request $request, Locacao $locacao)
     {
-        //
+        if ($request->isMethod('patch')) {
+            $regrasDinamicas = [];
+
+            // Gerar regras dinâmicas apenas para os campos enviados
+            foreach ($locacao->regras() as $input => $regra) {
+                if ($request->has($input)) {
+                    $regrasDinamicas[$input] = $regra;
+                }
+            }
+
+            $request->validate($regrasDinamicas);
+        } else {
+            $request->validate($locacao->regras());
+        }
+
+
+        $locacao->fill($request->all());
+        $locacao->save();
+
+        return response()->json($locacao, 200);
     }
 
     /**
@@ -79,8 +127,15 @@ class LocacaoController extends Controller
      * @param  \App\Models\Locacao  $locacao
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Locacao $locacao)
+    public function destroy($id)
     {
+        $locacao = Locacao::find($id);
+        if (! $locacao) {
+            return response()->json(['erro' => 'locação nao existe'], 404);
+        }
+        $locacao->delete();
+
+        return response()->json(['success' => 'locação deletado com sucesso'], 201);
         //
     }
 }

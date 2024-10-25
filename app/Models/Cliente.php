@@ -17,7 +17,6 @@ class Cliente extends Model
             'nome' => 'required'
         ];
     }
-    public function modelo()
     {
         return $this->belongsTo(Modelo::class);
     }

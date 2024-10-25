@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCarroRequest;
-use App\Http\Requests\UpdateCarroRequest;
 use App\Models\Carro;
 use App\Repositories\CarroRepository;
 use Illuminate\Http\Request;
