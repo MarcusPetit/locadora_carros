@@ -4,11 +4,13 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-9">
+
             <div class="card">
-                <div class="card-header">Login (component VUE)</div>
+                <div class="card-header">Login (novo)</div>
 
                 <div class="card-body">
                     <form method="POST" action="">
+                        <input type="hidden" name="_token" :value="csrf_token">
 
                         <div class="row mb-4">
                             <label for="email" class="col-md-5 col-form-label text-md-end">Email</label>
@@ -59,8 +61,6 @@
 
 <script>
     export default {
-        mounted() {
-            console.log('Component mounted.')
-        }
+        props: ['csrf_token']
     }
 </script>

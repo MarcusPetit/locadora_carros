@@ -5095,9 +5095,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  }
+  props: ['csrf_token']
 });
 
 /***/ }),
@@ -5156,11 +5154,6 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _vm._m(0);
-};
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
   return _c("div", {
     staticClass: "container"
   }, [_c("div", {
@@ -5171,14 +5164,27 @@ var staticRenderFns = [function () {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-header"
-  }, [_vm._v("Login (component VUE)")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Login (novo)")]), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("form", {
     attrs: {
       method: "POST",
       action: ""
     }
-  }, [_c("div", {
+  }, [_c("input", {
+    attrs: {
+      type: "hidden",
+      name: "_token"
+    },
+    domProps: {
+      value: _vm.csrf_token
+    }
+  }), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _vm._m(3)])])])])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "row mb-4"
   }, [_c("label", {
     staticClass: "col-md-5 col-form-label text-md-end",
@@ -5197,7 +5203,11 @@ var staticRenderFns = [function () {
       autocomplete: "email",
       autofocus: ""
     }
-  })])]), _vm._v(" "), _c("div", {
+  })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "row mb-4"
   }, [_c("label", {
     staticClass: "col-md-5 col-form-label text-md-end",
@@ -5215,7 +5225,11 @@ var staticRenderFns = [function () {
       required: "",
       autocomplete: "current-password"
     }
-  })])]), _vm._v(" "), _c("div", {
+  })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "row mb-4"
   }, [_c("div", {
     staticClass: "col-md-7 offset-md-4"
@@ -5233,7 +5247,11 @@ var staticRenderFns = [function () {
     attrs: {
       "for": "remember"
     }
-  }, [_vm._v("\n                                        Lembrar\n                                    ")])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                                        Lembrar\n                                    ")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "row mb-1"
   }, [_c("div", {
     staticClass: "col-md-9 offset-md-4"
@@ -5242,7 +5260,7 @@ var staticRenderFns = [function () {
     attrs: {
       type: "submit"
     }
-  }, [_vm._v("\n                                   Login\n                                ")])])])])])])])])]);
+  }, [_vm._v("\n                                   Login\n                                ")])])]);
 }];
 render._withStripped = true;
 
